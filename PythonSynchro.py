@@ -8,8 +8,8 @@ import stat
 ARGUMENTS = 5
 
 def log(log_path, message):
-      #Write in the log file that we give as parameter
-      #This allow to suport different log files in case it is needed
+      #Write in the log file that is given as a parameter
+      #This allows us to support different log files in case it is needed
       now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
       with open(log_path, "a") as f:
             f.write("[" +now+ "] "+message+"\n")
@@ -32,7 +32,6 @@ def file_hashing_compare(fileoriginal, filesynchro):
       #Compare md5
       if(md5_a==md5_b):
             equal = True
-            #print(fileoriginal+ " y " +filesynchro+ " son iguales")
 
       return equal
 
@@ -41,17 +40,17 @@ def compareHashFolder(original_folder, synchro_folder):
       files_original = os.listdir(original_folder)
       #get all files in the folder of the synchro folder
       files_backup = os.listdir(synchro_folder)
-      #Compare the 2 list of elements of the folders
+      #Compare the 2 lists of elements of the folders
       if len(files_original) != len(files_backup):
             return False
       for file in files_original:
             if file in files_backup:
-                  #if in the folder we have files we compare with the method for comparing files
+                  #if in the folder we have files, we compare them with the method for comparing files
                   if ( os.path.isfile(original_folder+"/"+file) and os.path.isfile(synchro_folder+"/"+file)):
                         if file_hashing_compare(original_folder+"/"+file, synchro_folder+"/"+file) != True:
                               return False
-                  #But if we have another folder inside, we must call again to check that folder, so we call it
-                  #in a recursive way, checking all folders that are inside folders.
+                  #But if we have another folder inside, we must call this function again to check that folder, so we call it
+                  #in a recursive way, checking all folders that are inside other folders.
                   elif( os.path.isdir(original_folder+"/"+file) and os.path.isdir(synchro_folder+"/"+file)):
                         if compareHashFolder(original_folder+"/"+file, synchro_folder+"/"+file) != True:
                               return False
@@ -61,10 +60,10 @@ def compareHashFolder(original_folder, synchro_folder):
 
 
 
-#Function utilized to do the synchronization
+#Function used to do the synchronization
 def synchronize ():
       print ("synchronizing")
-      #checking if the original and synchroniced folders exist, and if not, creating them
+      #checking if the original and synchronized folders exist, and if not, creating them
       if os.path.exists(original_folder_path) == False:
             log(log_file_path,"Original folder doesnt exits. Creating it")
             os.makedirs(original_folder_path)
@@ -76,7 +75,7 @@ def synchronize ():
       original_files = os.listdir(original_folder_path)
       synchronized_files =os.listdir(synchronized_folder_path)
 
-      #Loop for remove the files that doesnt exist in the original folder anymore
+      #Loop for removing the files that doesnt exist in the original folder anymore
       for filesynchro in synchronized_files:
             exist = False
             for file in original_files:
@@ -89,9 +88,9 @@ def synchronize ():
                   #If both files/folders are exactly the same, we break the loop as no more comparison are needed, saving computing time
                   if exist == True:
                         break
-            #In case the file/folder exist in the synchro folder but doesnt exist in the original folder, we delete it   
+            #In case the file/folder exists in the synchro folder but doesn't exist in the original folder, we delete it   
             if exist == False:
-                  log(log_file_path, "The file/folder "+filesynchro+" doesnt exist anymore or its not equal in the original folder. Deleting it")
+                  log(log_file_path, "The file/folder "+filesynchro+" doesn't exist anymore or it's not equal in the original folder. Deleting it")
                   #If it is a file, we delete it with the file deleting function
                   if ( os.path.isfile(synchronized_folder_path+"/"+filesynchro) ):
                         os.remove(synchronized_folder_path+"/"+filesynchro)
@@ -99,7 +98,7 @@ def synchronize ():
                   elif( os.path.isdir(synchronized_folder_path+"/"+filesynchro) ):
                         shutil.rmtree(synchronized_folder_path+"/"+filesynchro, ignore_errors=True)
 
-      #Loop for check if the files in original already exist in synchro, and if not, copy them.
+      #Loop to check if the files in the original already exist in synchro, and if not, copy them.
       for file in original_files:
             equal = False
             for filesynchro in synchronized_files:
@@ -109,10 +108,10 @@ def synchronize ():
                   #If they are 2 files, we compare with the file method of comparison
                   elif (os.path.isfile(synchronized_folder_path+"/"+filesynchro) and os.path.isfile(original_folder_path+"/"+file)):
                          equal = file_hashing_compare(original_folder_path+"/"+file, synchronized_folder_path+"/"+filesynchro)
-                  #If both files/folders are exactly the same, we break the loop as no more comparison are needed, saving computing time
+                  #If both files/folders are exactly the same, we break the loop as no more comparisons are needed, saving computing time
                   if equal == True:
                         break
-            #In case the file/folder doesnt exist in the synchro folder, we copy the filde/folder into it
+            #In case the file/folder doesn't exist in the synchro folder, we copy the file/folder into it
             if equal == False:
                   log(log_file_path,"The file "+file+" doesnt exist in the synchro folder. Copying it")
                   if ( os.path.isfile(original_folder_path+"/"+file) ):
@@ -128,10 +127,9 @@ def synchronize ():
 
 
 
-#Main of the code, that analise the arguments and print a error message if there are more/less arguments that should,
-#and execute the diferent functions to make the program work. It also use the sleep to regulate the time between synchros
-#Right now the bucle is infinite, so if you want to leave the loop, 
-#you have to use any of the console option (closing console, control+c, ...)
+#Main of the code, that analyse the arguments and prints an error message if there are more/fewer arguments that should,
+#and execute the different functions to make the program work. It also uses sleep function to regulate the time between synchros
+#Right now the loop is infinite, so if you want to leave the loop, you have to use any of the console option (closing console, control+c, ...)
 exit = 0
 if len(sys.argv) != ARGUMENTS:
         print("Number of arguments is (including the executing python file command)",len(sys.argv), "which its not ", ARGUMENTS)
